@@ -1,6 +1,7 @@
+
 # 🌟 TaskFlow
 
-**Live Demo:** https://garg‑shiv.github.io/Taskflow/
+**Live Demo:** [https://garg‑shiv.github.io/Taskflow/](https://garg‑shiv.github.io/Taskflow/)
 
 TaskFlow is a **personal productivity companion** built with plain HTML, CSS, and JavaScript. It helps users manage tasks across three stages (**Todo**, **Completed**, **Archived**) using a clean, responsive interface, persistent storage, and thoughtful UX.
 
@@ -66,124 +67,116 @@ TaskFlow exists to simplify task organization without the complexity of modern f
    ```bash
    git clone https://github.com/garg‑shiv/Taskflow.git
    cd Taskflow
-(Optional) Serve locally using any static server:
+   ```
+2. (Optional) Serve locally using any static server:
+   ```bash
+   npx http-server
+   ```
+   Browse to `index.html` or `app.html` to test or use the app
 
-bash
-Copy
-Edit
-npx http-server
-Browse to index.html or app.html to test or use the app
+---
 
-User Guide
-Landing Page (index.html)
-Enter Name and DOB
+## User Guide
 
-DOB must make the age ≥ 10
+### Landing Page (`index.html`)
 
-Error messages guide corrections
+- Enter Name and DOB (age must be ≥ 10)
+- Error messages guide corrections
+- Once valid, user data is saved and redirects to the Dashboard
 
-Once valid, user data is saved and redirects to the Dashboard
+### Dashboard (`app.html`)
 
-Dashboard (app.html)
-Navbar displays the user’s avatar and name, with a “Sign Out” button
+- Navbar shows user avatar, name, and a “Sign Out” button
+- Add task via input → Add button
+- Three columns: Todo, Completed, Archived (with counts)
 
-Add a task via input → Add button
+#### Stage Buttons
 
-Three columns: Todo, Completed, Archived (with counts)
+- **Todo**: Complete, Archive  
+- **Completed**: Move to Todo, Archive  
+- **Archived**: Move to Todo, Move to Completed  
 
-Buttons vary by stage:
+- Timestamps auto-update on task movement
+- Drag-and-drop for reordering or moving between stages
+- Sign Out clears local data and returns to landing
 
-Todo: Complete, Archive
+---
 
-Completed: Move to Todo, Archive
+## UX & Design Decisions
 
-Archived: Move to Todo, Move to Completed
+- Backdrop-filter navbar with blur and sticky layout
+- Elevated cards with subtle shadows
+- Toast alerts for feedback like "Task added", "Task moved"
+- Responsive layout with flexible gaps and column logic
+- Accessibility: focus states, ARIA labels, proper HTML semantics
 
-Timestamps update dynamically when moving tasks
+---
 
-Drag-and-drop tasks to reorder or change stages
+## Data Persistence & Flow
 
-Click Sign Out to clear local data and go back to landing
+- Tasks are stored in `localStorage` under key `tasks`
+- Each task structure:
+  ```json
+  {
+    "id": "uuid",
+    "text": "…",
+    "stage": "todo|completed|archived",
+    "modified": "ISO timestamp"
+  }
+  ```
+- On first load, 10 dummy tasks fetched from DummyJSON API and saved
+- All changes keep localStorage in sync
 
-UX & Design Decisions
-Backdrop-filter navbar—subtle blur and sticky layout for better focus
+---
 
-Elevated cards with subtle shadow promotion
+## Form & Age Validation
 
-Toast alerts provide feedback: "Task added", "Task moved", etc.
+- DOB picker limited to ensure age ≥ 10 using JavaScript
+- Inline validation before saving
+- Immediate and readable error feedback
 
-Responsive design with flexible gaps and column layouts
+---
 
-Accessible elements: focus states, aria-labels, proper semantics
+## Responsive Design
 
-Data Persistence & Flow
-Tasks stored in localStorage under tasks
+- 1-column layout for width < 600px  
+- 2-columns for 601–900px  
+- 3-columns for ≥ 901px  
+- Touch-friendly UI, fluid spacing, mobile-first design
 
-Structure per task:
+---
 
-js
-Copy
-Edit
-{
-  id: 'uuid',
-  text: '…',
-  stage: 'todo|completed|archived',
-  modified: 'ISO timestamp'
-}
-On first load, 10 dummy tasks are pulled via the DummyJSON API, transformed, and saved
+## Project Structure
 
-Every action keeps storage in sync
-
-Form & Age Validation
-The DOB picker is capped to 10 years back via JavaScript
-
-Input validation runs inline before storing user data
-
-Error feedback is immediate and human-readable
-
-Responsive Design
-1-column layout for screen < 600px
-
-2-columns when 601–900px
-
-3-columns for ≥ 901px
-
-Touch-friendly tap targets, fluid spacing, and mobile-first design
-
-Project Structure
-pgsql
-Copy
-Edit
+```
 /
 ├── index.html         ← Landing with age/name collection
 ├── app.html           ← Main dashboard interface
-├── style.css          ← Global style, responsive and animated UX
+├── style.css          ← Global styles, responsive & animated UX
 └── script.js          ← Logic for validation, API, drag/drop, storage
-Note: No build or transpilation steps—fully static for easy deployment.
+```
 
-Possible Future Enhancements
-🔍 Task search and filtering
+> Note: Fully static—no build/transpilation steps. Ready to deploy.
 
-🗂️ Priorities, tags, or color categories
+---
 
-📦 Export/import JSON for backups
+## Possible Future Enhancements
 
-🌙 Optional dark mode toggle
+- 🔍 Task search and filtering  
+- 🗂️ Priorities, tags, or color categories  
+- 📦 Export/import JSON for backups  
+- 🌙 Optional dark mode toggle  
+- ⏰ Reminder notifications for deadlines  
+- 🔲 Unit tests and CI integration  
 
-⏰ Reminder notifications for deadlines
+---
 
-🔲 Unit tests and CI
+## License & Contribution
 
-License & Contribution
-Licensed under MIT. Contributions are welcome:
+Licensed under **MIT**. Contributions welcome:
 
-Fork repo
-
-Create feature branch: git checkout -b feature-name
-
-Implement and test features
-
-Commit and push changes
-
-Submit a pull request
-
+1. Fork the repo  
+2. Create a feature branch: `git checkout -b feature-name`  
+3. Implement & test the feature  
+4. Commit and push changes  
+5. Submit a pull request  
