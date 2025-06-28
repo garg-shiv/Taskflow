@@ -1,0 +1,38 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="description" content="TaskFlow - Smart, Responsive Todo & Kanban">
+  <title>TaskFlow | Welcome</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-light">
+  <header class="navbar">
+    <div class="container">
+      <h1 class="logo">TaskFlow</h1>
+    </div>
+  </header>
+
+  <main class="welcome-section">
+    <div class="card welcome-card animate-fade-in">
+      <h2>Welcome to TaskFlow</h2>
+      <form id="user-form" novalidate>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" required placeholder="Your Name">
+        </div>
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input id="dob" name="dob" type="date" required>
+        </div>
+        <button type="submit" class="btn-primary btn-slide-up">Enter</button>
+        <p id="error-msg" class="error-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
