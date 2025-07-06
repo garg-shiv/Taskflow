@@ -1,5 +1,4 @@
 // script.js
-
 window.addEventListener('DOMContentLoaded', init);
 
 function init() {
@@ -12,9 +11,9 @@ function setupIndexPage() {
   const path = window.location.pathname;
   if (!path.endsWith('index.html') && !path.endsWith('/')) return;
 
-  const form     = document.getElementById('user-form');
-  const nameIn   = document.getElementById('name');
-  const dobIn    = document.getElementById('dob');
+  const form = document.getElementById('user-form');
+  const nameIn = document.getElementById('name');
+  const dobIn = document.getElementById('dob');
   const errorMsg = document.getElementById('error-msg');
 
   // Restrict DOB to at least 10 years old
@@ -32,19 +31,32 @@ function setupIndexPage() {
     errorMsg.textContent = '';
 
     const name = nameIn.value.trim();
-    const dob  = dobIn.value;
-    if (!name || !dob) {
+    const dobStr = dobIn.value;
+    if (!name || !dobStr) {
       errorMsg.textContent = 'All fields are required.';
       return;
     }
-    if (calculateAge(new Date(dob)) < 10) {
-      errorMsg.textContent = 'You must be at least 10 years old.';
+
+    const parsedDob = new Date(dobStr);
+    if (isNaN(parsedDob.getTime())) {
+      errorMsg.textContent = 'Please enter a valid date.';
       return;
     }
 
-    localStorage.setItem('user', JSON.stringify({ name, dob }));
+    const age = calculateAge(parsedDob);
+    if (age < 10) {
+      errorMsg.textContent = 'You must be at least 10 years old.';
+      return;
+    }
+    if (age > 100) {
+      errorMsg.textContent = 'Please enter a realistic age (less than 100 years).';
+      return;
+    }
+
+    localStorage.setItem('user', JSON.stringify({ name, dob: dobStr }));
     window.location.replace('app.html');
   });
+
 }
 
 function calculateAge(dob) {
@@ -63,7 +75,6 @@ function setupDashboardPage() {
     return window.location.replace('index.html');
   }
 
-  // Display user info
   document.getElementById('user-name').textContent = user.name;
   document.getElementById('avatar').src =
     `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4f46e5&color=fff&rounded=true`;
@@ -90,13 +101,13 @@ function setupDashboardPage() {
   // Add new task
   document.getElementById('add-btn').addEventListener('click', () => {
     const input = document.getElementById('new-task');
-    const text  = input.value.trim();
+    const text = input.value.trim();
     if (!text) return;
     tasks.push({
-      id       : uuid(),
-      text     : text,
-      stage    : 'todo',
-      modified : new Date().toISOString(),
+      id: uuid(),
+      text: text,
+      stage: 'todo',
+      modified: new Date().toISOString(),
     });
     saveTasks(STORAGE_KEY, tasks);
     renderTasks(tasks);
@@ -117,10 +128,10 @@ async function fetchInitialTasks() {
   if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
   const { todos } = await res.json();
   return todos.slice(0, 10).map(t => ({
-    id       : uuid(),
-    text     : t.todo,
-    stage    : 'todo',
-    modified : new Date().toISOString(),
+    id: uuid(),
+    text: t.todo,
+    stage: 'todo',
+    modified: new Date().toISOString(),
   }));
 }
 
@@ -134,7 +145,7 @@ function renderTasks(tasks) {
   const stages = ['todo', 'completed', 'archived'];
 
   stages.forEach(stage => {
-    const ul    = document.getElementById(`${stage}-list`);
+    const ul = document.getElementById(`${stage}-list`);
     const count = document.getElementById(`count-${stage}`);
     ul.innerHTML = '';
     const subset = tasks.filter(t => t.stage === stage);
@@ -142,10 +153,10 @@ function renderTasks(tasks) {
 
     subset.forEach(task => {
       const li = document.createElement('li');
-      li.className        = 'task-card';
-      li.draggable        = true;
-      li.dataset.id       = task.id;
-      li.innerHTML        = `
+      li.className = 'task-card';
+      li.draggable = true;
+      li.dataset.id = task.id;
+      li.innerHTML = `
         <div class="task-text">${task.text}</div>
         <time>${new Date(task.modified).toLocaleString()}</time>
       `;
@@ -155,38 +166,54 @@ function renderTasks(tasks) {
       li.addEventListener('dragend', () => li.classList.remove('dragging'));
 
       // Action buttons
-      const actions = document.createElement('div');
-      actions.className = 'task-actions';
-      addButtons(actions, task.id, tasks);
-      li.appendChild(actions);
+      const divelement = document.createElement('div');
+      divelement.className = 'task-actions';
+      addButtons(divelement, task.id, tasks);
+      li.appendChild(divelement);
 
       ul.appendChild(li);
     });
   });
 
   // Drag & Drop zones
+  // ✅ Fixed Drag & Drop zones
   stages.forEach(stage => {
     const ul = document.getElementById(`${stage}-list`);
+
     ul.addEventListener('dragover', e => {
       e.preventDefault();
       const dragging = document.querySelector('.dragging');
-      const after    = getDragAfter(ul, e.clientY);
+      if (!dragging) return;
+
+      const after = getDragAfter(ul, e.clientY);
       if (after) ul.insertBefore(dragging, after);
       else ul.appendChild(dragging);
     });
+
+    ul.addEventListener('dragenter', () => {
+      ul.classList.add('drag-over'); // for visual cue
+    });
+
+    ul.addEventListener('dragleave', () => {
+      ul.classList.remove('drag-over'); // remove on leave
+    });
+
     ul.addEventListener('drop', e => {
+      e.preventDefault();
+      ul.classList.remove('drag-over'); // clean up visual
       const dragging = document.querySelector('.dragging');
-      const id       = dragging.dataset.id;
+      const id = dragging.dataset.id;
       changeStageById(id, stage, tasks);
     });
   });
+
 }
 
 // Find insertion point
 function getDragAfter(container, y) {
   const items = [...container.querySelectorAll('.task-card:not(.dragging)')];
   return items.reduce((closest, child) => {
-    const box    = child.getBoundingClientRect();
+    const box = child.getBoundingClientRect();
     const offset = y - box.top - box.height / 2;
     return offset < 0 && offset > closest.offset
       ? { offset, element: child }
@@ -196,28 +223,29 @@ function getDragAfter(container, y) {
 
 // Create action buttons
 function addButtons(container, id, tasks) {
-  const task  = tasks.find(t => t.id === id);
-  const map   = {
-    todo     : [['Complete','btn-complete','completed'],['Archive','btn-archive','archived']],
-    completed: [['Move to Todo','btn-move','todo'],['Archive','btn-archive','archived']],
-    archived : [['Move to Todo','btn-move','todo'],['Move to Completed','btn-complete','completed']],
+  const task = tasks.find(t => t.id === id);
+  const map = {
+    todo: [['Complete', 'btn-complete', 'completed'], ['Archive', 'btn-archive', 'archived']],
+    completed: [['Move to Todo', 'btn-move', 'todo'], ['Archive', 'btn-archive', 'archived']],
+    archived: [['Move to Todo', 'btn-move', 'todo'], ['Move to Completed', 'btn-complete', 'completed']],
   };
+
+  function changeStageById(id, newStage, tasks) {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    task.stage = newStage;
+    task.modified = new Date().toISOString();
+    saveTasks('tasks', tasks);
+    renderTasks(tasks);
+  }
+
 
   map[task.stage].forEach(([label, cls, newStage]) => {
     const btn = document.createElement('button');
     btn.textContent = label;
-    btn.className   = cls;
+    btn.className = cls;
     btn.addEventListener('click', () => changeStageById(id, newStage, tasks));
     container.appendChild(btn);
   });
 }
 
-// Change a task’s stage, by ID
-function changeStageById(id, newStage, tasks) {
-  const idx = tasks.findIndex(t => t.id === id);
-  if (idx === -1) return;
-  tasks[idx].stage    = newStage;
-  tasks[idx].modified = new Date().toISOString();
-  saveTasks('tasks', tasks);
-  renderTasks(tasks);
-}

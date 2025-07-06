@@ -30,6 +30,7 @@
   margin: 0;
   padding: 0;
 }
+
 html {
   font-family: 'Inter', sans-serif;
   font-size: 16px;
@@ -239,9 +240,16 @@ body.theme-dark .column {
   font-size: 1.25rem;
 }
 
+/* ✅ Fixed Here: Task List Styling */
 .task-list {
   list-style: none;
+  min-height: 120px;
+  padding: 10px;
+  border: 2px dashed transparent;
+  transition: background 0.3s, border 0.3s;
 }
+
+/* Each card */
 .task-card {
   background: var(--color-bg-light);
   margin-bottom: 0.75rem;
@@ -282,8 +290,9 @@ body.theme-dark .column {
 .btn-move     { background: #3b82f6; color: #fff; }
 
 /* Drag & Drop Highlight */
-.drag-over {
-  outline: 2px dashed var(--color-primary);
+.task-list.drag-over {
+  background-color: #eef;
+  border-color: var(--color-primary);
 }
 
 /* Scrollbar */
@@ -294,6 +303,7 @@ body.theme-dark .column {
   background: var(--color-secondary);
   border-radius: 3px;
 }
+
 /* Navbar container */
 .navbar .container {
   display: flex;
@@ -328,7 +338,5 @@ body.theme-dark .column {
 
 /* Sign‐out button stays aligned */
 .btn-signout {
-  /* existing styles… */
-  /* ensure it's aligned centrally */
   align-self: center;
 }
