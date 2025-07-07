@@ -5,7 +5,6 @@ function init() {
   setupDashboardPage();
 }
 
-/** ===== Landing Page Logic ===== */
 function setupIndexPage() {
   const path = window.location.pathname;
   if (!path.endsWith('index.html') && !path.endsWith('/')) return;
@@ -15,7 +14,6 @@ function setupIndexPage() {
   const dobIn = document.getElementById('dob');
   const errorMsg = document.getElementById('error-msg');
 
-  // Restrict DOB to at least 10 years old
   const today = new Date();
   today.setFullYear(today.getFullYear() - 10);
   dobIn.max = today.toISOString().split('T')[0];
@@ -67,7 +65,6 @@ function calculateAge(dob) {
   return Math.abs(new Date(diff).getUTCFullYear() - 1970);
 }
 
-/** ===== Dashboard Logic ===== */
 function setupDashboardPage() {
   const path = window.location.pathname;
   if (!path.endsWith('app.html')) return;
@@ -103,6 +100,7 @@ function setupDashboardPage() {
     const input = document.getElementById('new-task');
     const text = input.value.trim();
     if (!text) return;
+    if (!(/^[A-Za-z0-9\s]+$/.test(text))) return;
     tasks.push({
       id: uuid(),
       text: text,
@@ -125,6 +123,7 @@ async function fetchInitialTasks() {
   const res = await fetch('https://dummyjson.com/todos');
   if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
   const { todos } = await res.json();
+
   return todos.slice(0, 10).map(t => ({
     id: uuid(),
     text: t.todo,
